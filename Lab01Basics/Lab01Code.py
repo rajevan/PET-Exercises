@@ -106,6 +106,10 @@ def point_add(a, b, p, x0, y0, x1, y1):
 
     # ADD YOUR CODE BELOW
     xr, yr = None, None
+
+    lam = ((y1 - y0) * ((x1 - x0)**(-1))) % p
+    xr = (lam**2 - x0 - x1) % p
+    yr = (lam * (x0 - xr) - y0) % p
     
     return (xr, yr)
 
@@ -123,6 +127,10 @@ def point_double(a, b, p, x, y):
 
     # ADD YOUR CODE BELOW
     xr, yr = None, None
+
+    lam = (((3*x)**2 + a) * ((2*y)**(-1))) % p
+    xr = lam**2 - 2 * x
+    yr = (lam * (x - xr) - y) % p
 
     return xr, yr
 
@@ -144,7 +152,9 @@ def point_scalar_multiplication_double_and_add(a, b, p, x, y, scalar):
     P = (x, y)
 
     for i in range(scalar.num_bits()):
-        pass ## ADD YOUR CODE HERE
+        if (scalar[i] == 1):
+            Q = point_add(a, b, p, P[0], P[1], Q[0], Q[1])
+        P = point_double(a, b, p, P[0], P[1])
 
     return Q
 
@@ -170,7 +180,12 @@ def point_scalar_multiplication_montgomerry_ladder(a, b, p, x, y, scalar):
     R1 = (x, y)
 
     for i in reversed(range(0,scalar.num_bits())):
-        pass ## ADD YOUR CODE HERE
+        if scalar[i] == 0:
+            R1 = point_add(a, b, p, R0[0], R0[1], R1[0], R1[1])
+            R0 = point_double(a, b, p, R0[0], R0[1])
+        else:
+            R0 = point_add(a, b, p, R0[0], R0[1], R1[0], R1[1])
+            R1 = point_double(a, b, p, R1[0], R1[1])
 
     return R0
 
