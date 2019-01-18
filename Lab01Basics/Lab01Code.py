@@ -8,7 +8,7 @@
 # $ py.test-2.7 -v Lab01Tests.py 
 
 ###########################
-# Group Members: TODO
+# Group Members: Ioakim Ioakim
 ###########################
 
 
@@ -180,7 +180,7 @@ def point_scalar_multiplication_montgomerry_ladder(a, b, p, x, y, scalar):
     R1 = (x, y)
 
     for i in reversed(range(0,scalar.num_bits())):
-        if scalar[i] == 0:
+        if R1[i] == 0:
             R1 = point_add(a, b, p, R0[0], R0[1], R1[0], R1[1])
             R0 = point_double(a, b, p, R0[0], R0[1])
         else:
@@ -210,12 +210,13 @@ def ecdsa_key_gen():
     pub_verify = priv_sign * G.generator()
     return (G, priv_sign, pub_verify)
 
-
 def ecdsa_sign(G, priv_sign, message):
     """ Sign the SHA256 digest of the message using ECDSA and return a signature """
     plaintext =  message.encode("utf8")
 
-    ## YOUR CODE HERE
+    digest = sha256(plaintext).digest()
+
+    sig = do_ecdsa_sign(G, priv_sign, digest)
 
     return sig
 
@@ -223,7 +224,9 @@ def ecdsa_verify(G, pub_verify, message, sig):
     """ Verify the ECDSA signature on the message """
     plaintext =  message.encode("utf8")
 
-    ## YOUR CODE HERE
+    digest = sha256(plaintext).digest()
+
+    res = do_ecdsa_verify(G, pub_verify, sig, digest)
 
     return res
 
@@ -242,7 +245,6 @@ def dh_get_key():
     pub_enc = priv_dec * G.generator()
     return (G, priv_dec, pub_enc)
 
-
 def dh_encrypt(pub, message, aliceSig = None):
     """ Assume you know the public key of someone else (Bob), 
     and wish to Encrypt a message for them.
@@ -253,6 +255,15 @@ def dh_encrypt(pub, message, aliceSig = None):
     """
     
     ## YOUR CODE HERE
+    G, priv_dec, pub_enc = dh_get_key()
+
+    g = G.generator()
+    y = pub_enc
+    x = pub
+    shared = g.pow(x).pow(y)
+
+    iv, ciphertext, tag = encrypt_message(shared, message)
+
     pass
 
 def dh_decrypt(priv, ciphertext, aliceVer = None):
